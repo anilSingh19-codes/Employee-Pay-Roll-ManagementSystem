@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -11,9 +12,13 @@ public class PayrollSystem extends JFrame implements ActionListener {
     CardLayout cardLayout;
     Connection con;
 
-    JTextField txtAdminUser, txtEmpUser, txtId, txtName, txtBasic, txtDeductions, txtOt, txtAttendance, txtEmpId;
+    JTextField txtAdminUser, txtEmpUser, txtId, txtName, txtBasic,
+            txtDeductions, txtOt, txtAttendance, txtEmpId;
     JPasswordField txtAdminPass, txtEmpPass;
-    JButton btnAdminLogin, btnEmpLogin, btnAdd, btnUpdate, btnLogoutAdmin, btnLogoutEmp, btnView;
+
+    JButton btnAdminLogin, btnEmpLogin, btnAdd, btnUpdate,
+            btnLogoutAdmin, btnLogoutEmp, btnView, btnShowEmployees;
+
     JTextArea adminArea, empArea;
 
     public PayrollSystem() {
@@ -42,15 +47,18 @@ public class PayrollSystem extends JFrame implements ActionListener {
         try {
             Properties props = new Properties();
             props.load(new FileInputStream("config.properties"));
+
             String url = props.getProperty("db.url");
             String user = props.getProperty("db.user");
             String password = props.getProperty("db.password");
 
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(url, user, password);
+
             System.out.println("✅ Database Connected");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "❌ Database Connection Failed\n" + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    "❌ Database Connection Failed\n" + e.getMessage());
         }
     }
 
@@ -59,52 +67,57 @@ public class PayrollSystem extends JFrame implements ActionListener {
         loginPanel = new JPanel(new GridLayout(1, 2, 10, 10));
         loginPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Admin Panel
+        // Admin Login
         JPanel adminLoginPanel = new JPanel(new GridBagLayout());
         adminLoginPanel.setBorder(BorderFactory.createTitledBorder("👑 Admin Login"));
         GridBagConstraints a = new GridBagConstraints();
         a.insets = new Insets(10, 10, 10, 10);
-        a.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel lblAdminUser = new JLabel("Username:");
-        JLabel lblAdminPass = new JLabel("Password:");
         txtAdminUser = new JTextField(15);
         txtAdminPass = new JPasswordField(15);
-        btnAdminLogin = new JButton("Login as Admin", new ImageIcon("icons/admin.png"));
-        btnAdminLogin.addActionListener(this);
+        btnAdminLogin = new JButton("Login as Admin");
 
-        a.gridx = 0; a.gridy = 0; adminLoginPanel.add(lblAdminUser, a);
-        a.gridx = 1; adminLoginPanel.add(txtAdminUser, a);
-        a.gridx = 0; a.gridy = 1; adminLoginPanel.add(lblAdminPass, a);
-        a.gridx = 1; adminLoginPanel.add(txtAdminPass, a);
+        a.gridx = 0; a.gridy = 0;
+        adminLoginPanel.add(new JLabel("Username:"), a);
+        a.gridx = 1;
+        adminLoginPanel.add(txtAdminUser, a);
+
+        a.gridx = 0; a.gridy = 1;
+        adminLoginPanel.add(new JLabel("Password:"), a);
+        a.gridx = 1;
+        adminLoginPanel.add(txtAdminPass, a);
+
         a.gridx = 0; a.gridy = 2; a.gridwidth = 2;
         adminLoginPanel.add(btnAdminLogin, a);
 
-        // Employee Panel
+        // Employee Login
         JPanel empLoginPanel = new JPanel(new GridBagLayout());
         empLoginPanel.setBorder(BorderFactory.createTitledBorder("💼 Employee Login"));
         GridBagConstraints e = new GridBagConstraints();
         e.insets = new Insets(10, 10, 10, 10);
-        e.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel lblEmpUser = new JLabel("Username:");
-        JLabel lblEmpPass = new JLabel("Password:");
         txtEmpUser = new JTextField(15);
         txtEmpPass = new JPasswordField(15);
-        btnEmpLogin = new JButton("Login as Employee", new ImageIcon("icons/employee.png"));
-        btnEmpLogin.addActionListener(this);
+        btnEmpLogin = new JButton("Login as Employee");
 
-        e.gridx = 0; e.gridy = 0; empLoginPanel.add(lblEmpUser, e);
-        e.gridx = 1; empLoginPanel.add(txtEmpUser, e);
-        e.gridx = 0; e.gridy = 1; empLoginPanel.add(lblEmpPass, e);
-        e.gridx = 1; empLoginPanel.add(txtEmpPass, e);
+        e.gridx = 0; e.gridy = 0;
+        empLoginPanel.add(new JLabel("Username:"), e);
+        e.gridx = 1;
+        empLoginPanel.add(txtEmpUser, e);
+
+        e.gridx = 0; e.gridy = 1;
+        empLoginPanel.add(new JLabel("Password:"), e);
+        e.gridx = 1;
+        empLoginPanel.add(txtEmpPass, e);
+
         e.gridx = 0; e.gridy = 2; e.gridwidth = 2;
         empLoginPanel.add(btnEmpLogin, e);
 
-        // Theme toggle;
-
         loginPanel.add(adminLoginPanel);
         loginPanel.add(empLoginPanel);
+
+        btnAdminLogin.addActionListener(this);
+        btnEmpLogin.addActionListener(this);
     }
 
     // ------------------ ADMIN PANEL ------------------
@@ -113,6 +126,7 @@ public class PayrollSystem extends JFrame implements ActionListener {
         adminPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel topPanel = new JPanel(new GridLayout(6, 2, 10, 10));
+
         txtId = new JTextField();
         txtName = new JTextField();
         txtBasic = new JTextField();
@@ -128,23 +142,27 @@ public class PayrollSystem extends JFrame implements ActionListener {
         topPanel.add(new JLabel("Attendance (days):")); topPanel.add(txtAttendance);
 
         JPanel buttonPanel = new JPanel();
+
         btnAdd = new JButton("Add Employee ➕");
         btnUpdate = new JButton("Update Employee 🔄");
+        btnShowEmployees = new JButton("Show Employees 📋");
         btnLogoutAdmin = new JButton("Logout 🚪");
+
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnUpdate);
+        buttonPanel.add(btnShowEmployees);
         buttonPanel.add(btnLogoutAdmin);
 
-        adminArea = new JTextArea(10, 40);
+        adminArea = new JTextArea(12, 40);
         adminArea.setEditable(false);
-        JScrollPane scroll = new JScrollPane(adminArea);
 
         adminPanel.add(topPanel, BorderLayout.NORTH);
-        adminPanel.add(scroll, BorderLayout.CENTER);
+        adminPanel.add(new JScrollPane(adminArea), BorderLayout.CENTER);
         adminPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         btnAdd.addActionListener(this);
         btnUpdate.addActionListener(this);
+        btnShowEmployees.addActionListener(this);
         btnLogoutAdmin.addActionListener(this);
     }
 
@@ -153,23 +171,21 @@ public class PayrollSystem extends JFrame implements ActionListener {
         employeePanel = new JPanel(new BorderLayout(10, 10));
         employeePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel top = new JPanel(new FlowLayout());
-        JLabel lbl = new JLabel("Enter Employee ID:");
+        JPanel top = new JPanel();
         txtEmpId = new JTextField(10);
         btnView = new JButton("View Details 👁️");
         btnLogoutEmp = new JButton("Logout 🚪");
 
-        top.add(lbl);
+        top.add(new JLabel("Enter Employee ID:"));
         top.add(txtEmpId);
         top.add(btnView);
         top.add(btnLogoutEmp);
 
-        empArea = new JTextArea(10, 40);
+        empArea = new JTextArea(12, 40);
         empArea.setEditable(false);
-        JScrollPane scroll = new JScrollPane(empArea);
 
         employeePanel.add(top, BorderLayout.NORTH);
-        employeePanel.add(scroll, BorderLayout.CENTER);
+        employeePanel.add(new JScrollPane(empArea), BorderLayout.CENTER);
 
         btnView.addActionListener(this);
         btnLogoutEmp.addActionListener(this);
@@ -182,11 +198,10 @@ public class PayrollSystem extends JFrame implements ActionListener {
             else if (e.getSource() == btnEmpLogin) employeeLogin();
             else if (e.getSource() == btnAdd) addEmployee();
             else if (e.getSource() == btnUpdate) updateEmployee();
+            else if (e.getSource() == btnShowEmployees) showAllEmployees();
             else if (e.getSource() == btnView) viewEmployee();
             else if (e.getSource() == btnLogoutAdmin || e.getSource() == btnLogoutEmp)
                 cardLayout.show(getContentPane(), "Login");
-            // else if (e.getSource() == btnToggleTheme)
-            
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
@@ -194,31 +209,34 @@ public class PayrollSystem extends JFrame implements ActionListener {
 
     // ------------------ LOGIC METHODS ------------------
     void adminLogin() throws SQLException {
-        PreparedStatement pst = con.prepareStatement("SELECT role FROM users WHERE username=? AND password=?");
+        PreparedStatement pst = con.prepareStatement(
+                "SELECT role FROM users WHERE username=? AND password=?");
         pst.setString(1, txtAdminUser.getText());
         pst.setString(2, new String(txtAdminPass.getPassword()));
+
         ResultSet rs = pst.executeQuery();
-        if (rs.next() && rs.getString("role").equals("admin")) {
+        if (rs.next() && rs.getString("role").equals("admin"))
             cardLayout.show(getContentPane(), "Admin");
-        } else {
+        else
             JOptionPane.showMessageDialog(this, "❌ Invalid Admin Login!");
-        }
     }
 
     void employeeLogin() throws SQLException {
-        PreparedStatement pst = con.prepareStatement("SELECT role FROM users WHERE username=? AND password=?");
+        PreparedStatement pst = con.prepareStatement(
+                "SELECT role FROM users WHERE username=? AND password=?");
         pst.setString(1, txtEmpUser.getText());
         pst.setString(2, new String(txtEmpPass.getPassword()));
+
         ResultSet rs = pst.executeQuery();
-        if (rs.next() && rs.getString("role").equals("employee")) {
+        if (rs.next() && rs.getString("role").equals("employee"))
             cardLayout.show(getContentPane(), "Employee");
-        } else {
+        else
             JOptionPane.showMessageDialog(this, "❌ Invalid Employee Login!");
-        }
     }
 
     void addEmployee() throws SQLException {
-        PreparedStatement pst = con.prepareStatement("INSERT INTO employees VALUES(?, ?, ?, ?, ?, ?)");
+        PreparedStatement pst = con.prepareStatement(
+                "INSERT INTO employees VALUES(?,?,?,?,?,?)");
         pst.setInt(1, Integer.parseInt(txtId.getText()));
         pst.setString(2, txtName.getText());
         pst.setDouble(3, Double.parseDouble(txtBasic.getText()));
@@ -226,13 +244,13 @@ public class PayrollSystem extends JFrame implements ActionListener {
         pst.setInt(5, Integer.parseInt(txtOt.getText()));
         pst.setInt(6, Integer.parseInt(txtAttendance.getText()));
         pst.executeUpdate();
+
         adminArea.setText("✅ Employee Added Successfully!");
     }
 
     void updateEmployee() throws SQLException {
         PreparedStatement pst = con.prepareStatement(
-            "UPDATE employees SET name=?, basic=?, deductions=?, ot=?, attendance=? WHERE id=?"
-        );
+                "UPDATE employees SET name=?, basic=?, deductions=?, ot=?, attendance=? WHERE id=?");
         pst.setString(1, txtName.getText());
         pst.setDouble(2, Double.parseDouble(txtBasic.getText()));
         pst.setDouble(3, Double.parseDouble(txtDeductions.getText()));
@@ -240,27 +258,58 @@ public class PayrollSystem extends JFrame implements ActionListener {
         pst.setInt(5, Integer.parseInt(txtAttendance.getText()));
         pst.setInt(6, Integer.parseInt(txtId.getText()));
         pst.executeUpdate();
+
         adminArea.setText("✅ Employee Updated Successfully!");
     }
 
-    void viewEmployee() throws SQLException {
-        PreparedStatement pst = con.prepareStatement("SELECT * FROM employees WHERE id=?");
-        pst.setInt(1, Integer.parseInt(txtEmpId.getText()));
+    void showAllEmployees() throws SQLException {
+        PreparedStatement pst = con.prepareStatement("SELECT * FROM employees");
         ResultSet rs = pst.executeQuery();
-        if (rs.next()) {
+
+        StringBuilder sb = new StringBuilder("===== Employee List =====\n\n");
+
+        while (rs.next()) {
             double basic = rs.getDouble("basic");
             double deductions = rs.getDouble("deductions");
             int ot = rs.getInt("ot");
             int attendance = rs.getInt("attendance");
+
             double total = basic + (ot * 100) - deductions;
             total *= (attendance / 30.0);
-            empArea.setText("Employee Details:\nName: " + rs.getString("name") +
-                    "\nBasic: " + basic + "\nOT: " + ot + "\nAttendance: " + attendance +
-                    "\nDeductions: " + deductions + "\n----------------------\nNet Pay: ₹" + String.format("%.2f", total));
-        } else empArea.setText("No employee found!");
+
+            sb.append("ID: ").append(rs.getInt("id"))
+              .append("\nName: ").append(rs.getString("name"))
+              .append("\nNet Pay: ₹").append(String.format("%.2f", total))
+              .append("\n--------------------------\n");
+        }
+
+        adminArea.setText(sb.toString());
+    }
+
+    void viewEmployee() throws SQLException {
+        PreparedStatement pst = con.prepareStatement(
+                "SELECT * FROM employees WHERE id=?");
+        pst.setInt(1, Integer.parseInt(txtEmpId.getText()));
+
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            double total = rs.getDouble("basic") +
+                    (rs.getInt("ot") * 100) -
+                    rs.getDouble("deductions");
+
+            total *= (rs.getInt("attendance") / 30.0);
+
+            empArea.setText(
+                    "Name: " + rs.getString("name") +
+                    "\nNet Pay: ₹" + String.format("%.2f", total)
+            );
+        } else {
+            empArea.setText("No employee found!");
+        }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new PayrollSystem().setVisible(true));
+        SwingUtilities.invokeLater(() ->
+                new PayrollSystem().setVisible(true));
     }
 }
